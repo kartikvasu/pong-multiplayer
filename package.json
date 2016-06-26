@@ -1,0 +1,25 @@
+{
+  "name": "pong-multiplayer",
+  "version": "1.0.0",
+  "description": "A pong-multiplayer game in the browser.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kartikvasu/pong-multiplayer.git"
+  },
+  "author": "kartikvasu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kartikvasu/pong-multiplayer/issues"
+  },
+  "homepage": "https://github.com/kartikvasu/pong-multiplayer#readme",
+  "dependencies": {
+    "d3": "^3.5.17",
+    "express": "^4.14.0",
+    "http": "0.0.0",
+    "socket.io": "^1.4.8"
+  }
+}
