@@ -44,11 +44,16 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	bar = __webpack_require__(1);
-	mainRender = __webpack_require__(2);
-	mainRender();
-	bar('#main').render_function();
-	console.log(bar);
+	var bar = __webpack_require__(1),
+	gameScreen = __webpack_require__(2),
+	keyControllers = __webpack_require__(3);
+
+	gameScreen(); //render the bare-bones game screen
+
+	bar('#main').render_function(); //render the player's bar
+
+	keyControllers();
+
 
 
 /***/ },
@@ -84,22 +89,39 @@
 /* 2 */
 /***/ function(module, exports) {
 
-	function mainRender() {
-
+	function screenRender() {
 		var width = window.innerWidth * 0.9,
 		height = window.innerHeight * 0.8;
-		
+
 		var chart = d3.select('#main')
 			.attr('width', width)
-			.attr('height', height);
+			.attr('height', height)
+			.style({
+				'border': '1px solid black'
+			});
+	}
 
-		chart.style({
-			'border': '1px solid black'
+	module.exports = screenRender;
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	function detectEvents() {
+		d3.select('body')
+		.on('keydown', function() {
+			console.log("You have pressed the " + d3.event.keyIdentifier + " key.");
+		});
+
+		d3.select('body')
+		.on('keyup', function() {
+			console.log("You have stopped pressing the " + d3.event.keyIdentifier + " key.");
 		});
 
 	}
 
-	module.exports = mainRender; 
+	module.exports = detectEvents;
 
 
 /***/ }
