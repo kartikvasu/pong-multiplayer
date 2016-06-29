@@ -4,7 +4,9 @@ keyControllers = require('./moveControllers');
 
 gameScreen(); //render the bare-bones game screen
 
-bar('#main').render_function(); //render the player's bar
+var playerBar = new bar();
+playerBar.renderBar('#main', true);
+console.log(playerBar);
 
 keyControllers();
 
