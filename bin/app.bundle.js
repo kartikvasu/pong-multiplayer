@@ -44,17 +44,19 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var bar = __webpack_require__(1),
-	gameScreen = __webpack_require__(2),
-	keyControllers = __webpack_require__(3);
+	var bar = __webpack_require__(1), //this is the constructor for the bar.
+	gameScreen = __webpack_require__(2), //draws the game screen.
+	keyControllers = __webpack_require__(3); //manages key events and launches 
 
 	gameScreen(); //render the bare-bones game screen
 
-	var playerBar = new bar();
-	playerBar.renderBar('#main', true);
+	var playerBar = new bar(); //initialize the player bar object.
+
+	playerBar.renderBar('#main', true); //give it a selection and boolean indicating whether it's a player bar.
+
 	console.log(playerBar);
 
-	keyControllers();
+	keyControllers(playerBar); //call the key controller function to listen for key events. 
 
 
 
@@ -68,6 +70,9 @@
 		// while rendering.
 		this.x = false;
 		this.y = false;
+		
+		//initialize the velocity of the bar.
+		this.xVelocity = 0;
 
 		//The selection in which the bar exists 
 		//it will be updated to the actual selection 
@@ -107,7 +112,18 @@
 				.attr("width", barWidth)
 				.attr("height", barHeight);
 		}
-		
+
+		//keep moving the bar depending on the velocity.
+		this.moveBar = function() {
+			this.x += this.xVelocity;
+
+			if(this.player === true) {
+				d3.select(this.selection)
+				.select('#player')
+				.attr("x", this.x);
+			}
+		}	
+
 		return this;
 	}
 
@@ -137,15 +153,31 @@
 /* 3 */
 /***/ function(module, exports) {
 
-	function detectEvents() {
+	function detectEvents(bar) {
 		d3.select('body')
 		.on('keydown', function() {
-			console.log("You have pressed the " + d3.event.keyIdentifier + " key.");
+
+			switch(d3.event.keyIdentifier) {
+				case 'Right': 
+					bar.xVelocity = 10;
+					break;
+				case 'Left':
+					bar.xVelocity = -10;
+				default:
+					console.log("Key not identified!");
+			}
+
+			bar.moveBar();
+
 		});
 
 		d3.select('body')
 		.on('keyup', function() {
-			console.log("You have stopped pressing the " + d3.event.keyIdentifier + " key.");
+
+			bar.xVelocity = 0;
+			
+			bar.moveBar();
+		
 		});
 
 	}

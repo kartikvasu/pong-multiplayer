@@ -4,6 +4,9 @@ var bar = function () {
 	// while rendering.
 	this.x = false;
 	this.y = false;
+	
+	//initialize the velocity of the bar.
+	this.xVelocity = 0;
 
 	//The selection in which the bar exists 
 	//it will be updated to the actual selection 
@@ -43,7 +46,18 @@ var bar = function () {
 			.attr("width", barWidth)
 			.attr("height", barHeight);
 	}
-	
+
+	//keep moving the bar depending on the velocity.
+	this.moveBar = function() {
+		this.x += this.xVelocity;
+
+		if(this.player === true) {
+			d3.select(this.selection)
+			.select('#player')
+			.attr("x", this.x);
+		}
+	}	
+
 	return this;
 }
 
