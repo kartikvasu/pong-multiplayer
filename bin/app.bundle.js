@@ -45,16 +45,25 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var bar = __webpack_require__(1), //this is the constructor for the bar.
-	gameScreen = __webpack_require__(2), //draws the game screen.
-	keyControllers = __webpack_require__(3); //manages key events and launches 
+	    ball = __webpack_require__(2),
+	gameScreen = __webpack_require__(3), //draws the game screen.
+	keyControllers = __webpack_require__(4); //manages key events and launches 
 
 	gameScreen(); //render the bare-bones game screen
 
-	var playerBar = new bar(); //initialize the player bar object.
+	var playerBar = new bar(), //initialize the player bar object.
+	    ball = new ball();
 
 	playerBar.renderBar('#main', true); //give it a selection and boolean indicating whether it's a player bar.
 
+	ball.renderBall('#main');
+
+	setInterval(function() {
+		ball.moveBall();
+	}, 1);
+
 	console.log(playerBar);
+	console.log(ball);
 
 	keyControllers(playerBar); //call the key controller function to listen for key events. 
 
@@ -134,6 +143,69 @@
 /* 2 */
 /***/ function(module, exports) {
 
+	var ball = function () {
+
+		//Initialize the position to false first, update
+		// while rendering.
+		this.x = false;
+		this.y = false;
+		this.radius = 10;
+
+		//initialize the velocity of the bar.
+		this.xVelocity = 0.5;
+		this.yVelocity = 0.5;
+
+		//the selection in which the bar exists
+		//it will be updated to the actual selection
+		//during render.
+		this.selection = false;
+
+		this.renderBall = function(selection) {
+
+			var width = d3.select(selection).attr("width"),
+			height = d3.select(selection).attr("height");
+
+			var barHeight = d3.select(selection).select('#player').attr("height"),
+			barWidth = d3.select(selection).select('#player').attr("width"),
+			x = d3.select(selection).select('#player').attr('x');
+
+			this.selection = selection;
+			this.x = parseInt(x) + barWidth / 2;
+			this.y = height - barHeight - this.radius;
+
+			var ball = d3.select(selection)
+				.append("circle")
+				.attr("id", "ball")
+				.attr("cx", this.x)
+				.attr("cy", this.y)
+				.attr("r", this.radius).
+				attr("fill", "#4B7BA6");
+
+		}
+
+		this.moveBall = function () {
+		
+			this.x += this.xVelocity;
+			this.y -= this.yVelocity;
+
+			d3.select(this.selection)
+				.select('#ball')
+				.attr("cx", this.x)
+				.attr("cy", this.y)
+				.ease("linear");	
+
+		}
+
+		return this;
+	}
+
+	module.exports = ball;
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
 	function screenRender() {
 		var width = window.innerWidth * 0.9,
 		height = window.innerHeight * 0.8;
@@ -150,7 +222,7 @@
 
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports) {
 
 	function detectEvents(bar) {
@@ -163,8 +235,10 @@
 					break;
 				case 'Left':
 					bar.xVelocity = -10;
+					break;
 				default:
 					console.log("Key not identified!");
+					break;
 			}
 
 			bar.moveBar();

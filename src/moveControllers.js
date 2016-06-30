@@ -8,8 +8,10 @@ function detectEvents(bar) {
 				break;
 			case 'Left':
 				bar.xVelocity = -10;
+				break;
 			default:
 				console.log("Key not identified!");
+				break;
 		}
 
 		bar.moveBar();
