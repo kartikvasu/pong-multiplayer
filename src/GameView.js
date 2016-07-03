@@ -36,3 +36,5 @@ function GameView(Game, container, width, height) {
 	}
 
 }
+
+module.exports = GameView;
