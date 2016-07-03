@@ -62,9 +62,6 @@
 		ball.moveBall();
 	}, 1);
 
-	console.log(playerBar);
-	console.log(ball);
-
 	keyControllers(playerBar); //call the key controller function to listen for key events. 
 
 
@@ -191,8 +188,7 @@
 			d3.select(this.selection)
 				.select('#ball')
 				.attr("cx", this.x)
-				.attr("cy", this.y)
-				.ease("linear");	
+				.attr("cy", this.y);	
 
 		}
 

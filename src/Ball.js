@@ -46,8 +46,7 @@ var ball = function () {
 		d3.select(this.selection)
 			.select('#ball')
 			.attr("cx", this.x)
-			.attr("cy", this.y)
-			.ease("linear");	
+			.attr("cy", this.y);	
 
 	}
 

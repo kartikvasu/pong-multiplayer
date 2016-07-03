@@ -16,8 +16,5 @@ setInterval(function() {
 	ball.moveBall();
 }, 1);
 
-console.log(playerBar);
-console.log(ball);
-
 keyControllers(playerBar); //call the key controller function to listen for key events. 
 
