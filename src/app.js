@@ -1,7 +1,7 @@
-var bar = require('./Bar'), //this is the constructor for the bar.
-    ball = require('./Ball'),
-gameScreen = require('./playScreen'), //draws the game screen.
-keyControllers = require('./moveControllers'); //manages key events and launches 
+var bar = require('./BarView'), //this is the constructor for the bar.
+    ball = require('./BallView'),
+gameScreen = require('./GameView'), //draws the game screen.
+keyControllers = require('./eventControllers'); //manages key events and launches 
 
 gameScreen(); //render the bare-bones game screen
 
