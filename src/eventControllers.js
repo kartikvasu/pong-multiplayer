@@ -4,27 +4,20 @@ function detectEvents(bar) {
 
 		switch(d3.event.keyIdentifier) {
 			case 'Right': 
-				bar.xVelocity = 10;
+				console.log('The right key was clicked');
 				break;
 			case 'Left':
-				bar.xVelocity = -10;
+				console.log('The left key was clicked');
 				break;
 			default:
-				console.log("Key not identified!");
-				break;
-		}
-
-		bar.moveBar();
-
+				console.log("Key not ident
 	});
 
 	d3.select('body')
 	.on('keyup', function() {
 
-		bar.xVelocity = 0;
-		
-		bar.moveBar();
-	
+		console.log('Keyup happened');
+
 	});
 
 }
