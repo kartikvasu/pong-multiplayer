@@ -14,8 +14,8 @@ var BarView = function (Bar, container, id) {
 	this.Bar = Bar;
 
 	/**
-	 * This is the container in which the bar is being
-	 * rendered (or in which the game is being played).
+	 * This is a d3 style selection of the container
+	 * into which the bar is to be rendered. 
 	 */
 	this.container = container;
 
@@ -29,8 +29,8 @@ var BarView = function (Bar, container, id) {
 	//according to the specification provided. 
 	this.renderBarView = function () {
 
-		var width = d3.select(this.container).attr("width"),
-		height = d3.select(this.container).attr("height");
+		var width = this.container.attr("width"),
+		height = this.container.attr("height");
 
 		var barWidth = 0.2 * width,
 		barHeight = 0.02 * height;
@@ -38,7 +38,7 @@ var BarView = function (Bar, container, id) {
 		//TODO make sure that the position
 		//and sizes and everything are scaled
 		//before deploy. VERY IMPORTANT!	
-		var bar = d3.select(this.container)
+		var bar = this.container
 			.append("rect")
 			.attr("id", this.id)
 			.attr("x", this.Bar.position.x)
@@ -55,14 +55,16 @@ var BarView = function (Bar, container, id) {
 	//outside somewhere.
 	this.moveBarView = function () {
 
-		var curX = d3.select(this.container)
+		var curX = this.container
 			.select(this.id)
 			.attr("x");
 
-		d3.select(this.container)
-			.select(this.id)
-			.attr("x", curX + this.Bar.velocity.x);
+		this.container
+		.select(this.id)
+		.attr("x", curX + this.Bar.velocity.x);
 	}
 
 	return this;	
 }
+
+module.exports = BarView;

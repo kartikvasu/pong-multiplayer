@@ -10,7 +10,8 @@ function detectEvents(bar) {
 				console.log('The left key was clicked');
 				break;
 			default:
-				console.log("Key not ident
+				console.log("Key not identified");
+		}
 	});
 
 	d3.select('body')

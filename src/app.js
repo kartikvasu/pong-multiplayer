@@ -1,20 +1,29 @@
-var bar = require('./BarView'), //this is the constructor for the bar.
-    ball = require('./BallView'),
-gameScreen = require('./GameView'), //draws the game screen.
-keyControllers = require('./eventControllers'); //manages key events and launches 
 
-gameScreen(); //render the bare-bones game screen
+var BarView = require('./BarView'), //this is the constructor for the bar.
+    BallView = require('./BallView'),
+GameView = require('./GameView'), //draws the game screen.
+eventControllers = require('./eventControllers'); //manages key events and launches 
 
-var playerBar = new bar(), //initialize the player bar object.
-    ball = new ball();
+ //TODO figure out a way to load the game from socket into this JS file.
 
-playerBar.renderBar('#main', true); //give it a selection and boolean indicating whether it's a player bar.
+var socket = io.connect('http://localhost:8000');
 
-ball.renderBall('#main');
+var game;
 
-setInterval(function() {
-	ball.moveBall();
-}, 1);
+socket.on('load', function(a_game) {
+	console.log(a_game);
+	game = a_game;
 
-keyControllers(playerBar); //call the key controller function to listen for key events. 
+var container = d3.select('#main');
 
+var game_view = new GameView(game, container, 500, 500),
+    ball_view = new BallView(game.ball, container, '#ball'),
+    player_view = new BarView(game.playerOneBar, container, '#player'),
+    opponent_view = new BarView(game.playerTwoBar, container, '#opponent');
+
+
+game_view.renderGameView();
+player_view.renderBarView();
+opponent_view.renderBarView();
+ball_view.renderBallView();
+});

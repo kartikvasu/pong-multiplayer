@@ -44,177 +44,221 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var bar = __webpack_require__(1), //this is the constructor for the bar.
-	    ball = __webpack_require__(2),
-	gameScreen = __webpack_require__(3), //draws the game screen.
-	keyControllers = __webpack_require__(4); //manages key events and launches 
+	
+	var BarView = __webpack_require__(1), //this is the constructor for the bar.
+	    BallView = __webpack_require__(2),
+	GameView = __webpack_require__(3), //draws the game screen.
+	eventControllers = __webpack_require__(4); //manages key events and launches 
 
-	gameScreen(); //render the bare-bones game screen
+	 //TODO figure out a way to load the game from socket into this JS file.
 
-	var playerBar = new bar(), //initialize the player bar object.
-	    ball = new ball();
+	var socket = io.connect('http://localhost:8000');
 
-	playerBar.renderBar('#main', true); //give it a selection and boolean indicating whether it's a player bar.
+	var game;
 
-	ball.renderBall('#main');
+	socket.on('load', function(a_game) {
+		console.log(a_game);
+		game = a_game;
 
-	setInterval(function() {
-		ball.moveBall();
-	}, 1);
+	var container = d3.select('#main');
 
-	keyControllers(playerBar); //call the key controller function to listen for key events. 
+	var game_view = new GameView(game, container, 500, 500),
+	    ball_view = new BallView(game.ball, container, '#ball'),
+	    player_view = new BarView(game.playerOneBar, container, '#player'),
+	    opponent_view = new BarView(game.playerTwoBar, container, '#opponent');
 
+
+	game_view.renderGameView();
+	player_view.renderBarView();
+	opponent_view.renderBarView();
+	ball_view.renderBallView();
+	});
 
 
 /***/ },
 /* 1 */
 /***/ function(module, exports) {
 
-	var bar = function () {
+	var BarView = function (Bar, container, id) {
 
-		//Initialize the position to false first, update
-		// while rendering.
-		this.x = false;
-		this.y = false;
-		
-		//initialize the velocity of the bar.
-		this.xVelocity = 0;
+		/**
+		 * TODO 
+		 * Checks for input values. Make sure every
+		 * input variable is clean before starting
+		 * assignments.
+		 */
 
-		//The selection in which the bar exists 
-		//it will be updated to the actual selection 
-		//during render.
-		this.selection = false;
+		/**
+		 * This is the bar associated with this particular
+		 * barView.
+		 */
+		this.Bar = Bar;
 
-		//boolean indicating if this is a player bar.
-		this.player = NaN;
+		/**
+		 * This is a d3 style selection of the container
+		 * into which the bar is to be rendered. 
+		 */
+		this.container = container;
 
-		//You would pass in a selection to render the bar.
-		this.renderBar = function(selection, player) {
+		/**
+		 * The id of the svg rect element associated with
+		 * this bar.
+		 */
+		this.id = id;
 
-			var width = d3.select(selection).attr("width"),
-			height = d3.select(selection).attr("height");
+		//this function renders the barView 
+		//according to the specification provided. 
+		this.renderBarView = function () {
+
+			var width = this.container.attr("width"),
+			height = this.container.attr("height");
 
 			var barWidth = 0.2 * width,
-		       	barHeight = 0.02 * height;
-
-			//update all the variables of the bar object.
-			this.selection = selection;
-			this.x = (width - barWidth) / 2;
-			this.y = height - barHeight - 5;	
-			this.player = player;
-
-			var playBar = d3.select(selection)
+			barHeight = 0.02 * height;
+		
+			//TODO make sure that the position
+			//and sizes and everything are scaled
+			//before deploy. VERY IMPORTANT!	
+			var bar = this.container
 				.append("rect")
-				.attr("id", function() {
-					if(player === true) {
-						return 'player';
-					} else {
-						return 'opponent';
-					}
-				})
-				.attr("fill", "#900C3F")
-			      	.attr("x", this.x)
-				.attr("y", this.y)
-				.attr("width", barWidth)
-				.attr("height", barHeight);
+				.attr("id", this.id)
+				.attr("x", this.Bar.position.x)
+				.attr("y", this.Bar.position.y)
+				.attr("width", this.Bar.barWidth)
+				.attr("height", this.Bar.barHeight)
+				.attr("fill", '#900C3F');
+
 		}
 
-		//keep moving the bar depending on the velocity.
-		this.moveBar = function() {
-			this.x += this.xVelocity;
+		//this function moves the bar by the velocity.
+		//However, right now it is not persistent. Therefore
+		//you would need to pass it to a setTimeOut function
+		//outside somewhere.
+		this.moveBarView = function () {
 
-			if(this.player === true) {
-				d3.select(this.selection)
-				.select('#player')
-				.attr("x", this.x);
-			}
-		}	
+			var curX = this.container
+				.select(this.id)
+				.attr("x");
 
-		return this;
+			this.container
+			.select(this.id)
+			.attr("x", curX + this.Bar.velocity.x);
+		}
+
+		return this;	
 	}
 
-	module.exports = bar;
+	module.exports = BarView;
 
 
 /***/ },
 /* 2 */
 /***/ function(module, exports) {
 
-	var ball = function () {
+	var BallView = function (Ball, container, id) {
 
-		//Initialize the position to false first, update
-		// while rendering.
-		this.x = false;
-		this.y = false;
-		this.radius = 10;
+		/** 
+		 * TODO
+		 * Checks for input values. Make sure every
+		 * input variable is clean before starting 
+		 * assignments.
+		 */
 
-		//initialize the velocity of the bar.
-		this.xVelocity = 0.5;
-		this.yVelocity = 0.5;
+		/**
+		 * This is the ball object associated with this 
+		 * particular BallView.
+		 */
+		this.Ball = Ball;
 
-		//the selection in which the bar exists
-		//it will be updated to the actual selection
-		//during render.
-		this.selection = false;
+		/**
+		 * This is a d3 style selection into which the ball 
+		 * is rendered. Very important point to remember. 
+		 */
+		this.container = container;
 
-		this.renderBall = function(selection) {
+		/** 
+		 * This is the id that is associated with the BallView.
+		 */
+		this.id = id;
 
-			var width = d3.select(selection).attr("width"),
-			height = d3.select(selection).attr("height");
+		this.renderBallView = function () {
 
-			var barHeight = d3.select(selection).select('#player').attr("height"),
-			barWidth = d3.select(selection).select('#player').attr("width"),
-			x = d3.select(selection).select('#player').attr('x');
+			var width = this.container.attr("width"),
+			height = this.container.attr("height");
 
-			this.selection = selection;
-			this.x = parseInt(x) + barWidth / 2;
-			this.y = height - barHeight - this.radius;
-
-			var ball = d3.select(selection)
+			//TODO make sure that position, sizes, 
+			//and velocity is scaled before deploy.
+			//VERY IMPORTANT!!
+			var ball = this.container
 				.append("circle")
-				.attr("id", "ball")
-				.attr("cx", this.x)
-				.attr("cy", this.y)
-				.attr("r", this.radius).
-				attr("fill", "#4B7BA6");
-
+				.attr("id", this.id)
+				.attr("cx", this.Ball.position.x)
+				.attr("cy", this.Ball.position.y)
+				.attr("r", this.Ball.radius)
+				.attr("fill",'#900C3F');
 		}
 
-		this.moveBall = function () {
+		//this function moves the ballView by the velocity.
+		//However, right now it is not persistent. Therefore
+		//you would need to pass it to a setInterval function
+		//from outside somewhere.  The app.js (main) js file
+		//in src, would be ideal.
+		function moveBall  () {
+			
+			var selection = this.container.select(this.id);
+
+			var curX = selection.attr("cx"),
+			curY = selection.attr("cy");
+
+			selection.attr("x", curX + this.Ball.velocity.x)
+				.attr("y", curY + this.Ball.velocity.y);
 		
-			this.x += this.xVelocity;
-			this.y -= this.yVelocity;
-
-			d3.select(this.selection)
-				.select('#ball')
-				.attr("cx", this.x)
-				.attr("cy", this.y);	
-
 		}
-
+		
 		return this;
 	}
 
-	module.exports = ball;
+	module.exports = BallView;
 
 
 /***/ },
 /* 3 */
 /***/ function(module, exports) {
 
-	function screenRender() {
-		var width = window.innerWidth * 0.9,
-		height = window.innerHeight * 0.8;
+	function GameView(Game, container, width, height) {
 
-		var chart = d3.select('#main')
-			.attr('width', width)
-			.attr('height', height)
-			.style({
-				'border': '1px solid black'
-			});
+		/*
+		 * TODO add checks here to make sure that 
+		 * Game and container objects are input 
+		 * cleanly during creation. 
+		 */
+		
+		/*
+		 * This is the big Game object that encodes
+		 * all the data for a particular game. See 
+		 * the game object file for more information.
+		 */
+		this.Game = Game;
+
+		/*
+		 * This is the d3 style selection of the 
+		 * container which we are rendering the 
+		 * arena onto.
+		 */
+		this.container = container;
+
+		this.renderGameView = function () {
+			var arena = this.container
+				.attr('width', width)
+				.attr('height', height)
+				.style({
+					'border': '1px solid black'
+				});
+		}
+
 	}
 
-	module.exports = screenRender;
+	module.exports = GameView;
 
 
 /***/ },
@@ -227,27 +271,21 @@
 
 			switch(d3.event.keyIdentifier) {
 				case 'Right': 
-					bar.xVelocity = 10;
+					console.log('The right key was clicked');
 					break;
 				case 'Left':
-					bar.xVelocity = -10;
+					console.log('The left key was clicked');
 					break;
 				default:
-					console.log("Key not identified!");
-					break;
+					console.log("Key not identified");
 			}
-
-			bar.moveBar();
-
 		});
 
 		d3.select('body')
 		.on('keyup', function() {
 
-			bar.xVelocity = 0;
-			
-			bar.moveBar();
-		
+			console.log('Keyup happened');
+
 		});
 
 	}

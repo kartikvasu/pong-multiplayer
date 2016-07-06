@@ -14,8 +14,8 @@ var BallView = function (Ball, container, id) {
 	this.Ball = Ball;
 
 	/**
-	 * This is the container object in which the BallView
-	 * is to be rendered.
+	 * This is a d3 style selection into which the ball 
+	 * is rendered. Very important point to remember. 
 	 */
 	this.container = container;
 
@@ -26,19 +26,18 @@ var BallView = function (Ball, container, id) {
 
 	this.renderBallView = function () {
 
-		var width = d3.select(this.container).attr("width"),
-		height = d3.select(this.container).attr("height");
+		var width = this.container.attr("width"),
+		height = this.container.attr("height");
 
 		//TODO make sure that position, sizes, 
 		//and velocity is scaled before deploy.
 		//VERY IMPORTANT!!
-		
-		var ball = d3.select(this.container)
+		var ball = this.container
 			.append("circle")
 			.attr("id", this.id)
 			.attr("cx", this.Ball.position.x)
 			.attr("cy", this.Ball.position.y)
-			.attr("radius", this.Ball.radius)
+			.attr("r", this.Ball.radius)
 			.attr("fill",'#900C3F');
 	}
 
@@ -49,8 +48,7 @@ var BallView = function (Ball, container, id) {
 	//in src, would be ideal.
 	function moveBall  () {
 		
-		var selection = d3.select(this.container)
-			.select(this.id);
+		var selection = this.container.select(this.id);
 
 		var curX = selection.attr("cx"),
 		curY = selection.attr("cy");
@@ -62,3 +60,5 @@ var BallView = function (Ball, container, id) {
 	
 	return this;
 }
+
+module.exports = BallView;

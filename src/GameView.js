@@ -14,20 +14,14 @@ function GameView(Game, container, width, height) {
 	this.Game = Game;
 
 	/*
-	 * This is the container in which the game 
-	 * is being rendered. Ideally it should be the
-	 * standard svg container ID that you're passing
-	 * in here. Adaptable depending on situation.
+	 * This is the d3 style selection of the 
+	 * container which we are rendering the 
+	 * arena onto.
 	 */
 	this.container = container;
 
 	this.renderGameView = function () {
-		renderGameScreen();
-	}
-
-	function renderGameScreen() {
-
-		var arena = d3.select(this.container)
+		var arena = this.container
 			.attr('width', width)
 			.attr('height', height)
 			.style({
