@@ -44,19 +44,18 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	
-	var BarView = __webpack_require__(1), //this is the constructor for the bar.
-	    BallView = __webpack_require__(2),
-	GameView = __webpack_require__(3), //draws the game screen.
-	eventControllers = __webpack_require__(4); //manages key events and launches 
+	(function() {
+	var BarView = __webpack_require__(1), //BarView object encapsulates rendering info for bar on the front-end.
+	    BallView = __webpack_require__(2), //BallView object encapsulates rendering info for the ball on the front-end.
+	    GameView = __webpack_require__(3), //GameView object encapsulates rendering info for the game generally, including the layout on the front-end.
+	    eventControllers = __webpack_require__(4); //manages key events and launches 
 
-	 //TODO figure out a way to load the game from socket into this JS file.
+	var socket = io.connect('http://localhost:8000'), //maintains the connection b/w front-end JS and back-end socket stuff.
+	game; //game variable that holds game info.
 
-	var socket = io.connect('http://localhost:8000');
-
-	var game;
-
-	socket.on('load', function(a_game) {
+	socket.on('load', initGame); 
+			
+	function initGame (a_game) {
 		console.log(a_game);
 		game = a_game;
 
@@ -72,7 +71,9 @@
 	player_view.renderBarView();
 	opponent_view.renderBarView();
 	ball_view.renderBallView();
-	});
+	};
+
+	}());
 
 
 /***/ },
