@@ -5,7 +5,7 @@ Isn't that what all games are though?
 
 TODO:  
 <ul>
-  <li>Implement scaling stuff b/w back-end and front-end.</li>
+  <li><strike>Implement scaling stuff b/w back-end and front-end.</strike></li>
   <li>Figure out player-opponent distinction stuff at front-end.</li>
   <li>More error checking at the front-end. Could think about throwing exceptions.</li>
   <li>Setup event controllers.
