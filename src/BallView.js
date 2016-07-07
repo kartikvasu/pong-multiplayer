@@ -35,9 +35,9 @@ var BallView = function (Ball, container, id) {
 		var ball = this.container
 			.append("circle")
 			.attr("id", this.id)
-			.attr("cx", this.Ball.position.x)
-			.attr("cy", this.Ball.position.y)
-			.attr("r", this.Ball.radius)
+			.attr("cx", this.Ball.position.x * width)
+			.attr("cy", this.Ball.position.y * height)
+			.attr("r", this.Ball.radius * width)
 			.attr("fill",'#900C3F');
 	}
 

@@ -44,36 +44,36 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	(function() {
+	
 	var BarView = __webpack_require__(1), //BarView object encapsulates rendering info for bar on the front-end.
 	    BallView = __webpack_require__(2), //BallView object encapsulates rendering info for the ball on the front-end.
 	    GameView = __webpack_require__(3), //GameView object encapsulates rendering info for the game generally, including the layout on the front-end.
 	    eventControllers = __webpack_require__(4); //manages key events and launches 
 
-	var socket = io.connect('http://localhost:8000'), //maintains the connection b/w front-end JS and back-end socket stuff.
-	game; //game variable that holds game info.
+	 //TODO figure out a way to load the game from socket into this JS file.
 
-	socket.on('load', initGame); 
-			
-	function initGame (a_game) {
+	var socket = io.connect('http://192.168.1.3:8000');
+
+	var game;
+
+	socket.on('load', function(a_game) {
 		console.log(a_game);
 		game = a_game;
 
 	var container = d3.select('#main');
 
-	var game_view = new GameView(game, container, 500, 500),
-	    ball_view = new BallView(game.ball, container, '#ball'),
-	    player_view = new BarView(game.playerOneBar, container, '#player'),
-	    opponent_view = new BarView(game.playerTwoBar, container, '#opponent');
+	var game_view = new GameView(game, container, window.innerWidth * 0.8, window.innerHeight * 0.8),
+	    ball_view = new BallView(game.ball, container, 'ball'),
+	    player_view = new BarView(game.playerOneBar, container, 'player'),
+	    opponent_view = new BarView(game.playerTwoBar, container, 'opponent');
 
 
 	game_view.renderGameView();
 	player_view.renderBarView();
 	opponent_view.renderBarView();
 	ball_view.renderBallView();
-	};
-
-	}());
+	eventControllers(player_view);
+	});
 
 
 /***/ },
@@ -81,7 +81,6 @@
 /***/ function(module, exports) {
 
 	var BarView = function (Bar, container, id) {
-
 		/**
 		 * TODO 
 		 * Checks for input values. Make sure every
@@ -123,10 +122,10 @@
 			var bar = this.container
 				.append("rect")
 				.attr("id", this.id)
-				.attr("x", this.Bar.position.x)
-				.attr("y", this.Bar.position.y)
-				.attr("width", this.Bar.barWidth)
-				.attr("height", this.Bar.barHeight)
+				.attr("x", this.Bar.position.x * width)
+				.attr("y", this.Bar.position.y * height)
+				.attr("width", this.Bar.barWidth * width)
+				.attr("height", this.Bar.barHeight * height)
 				.attr("fill", '#900C3F');
 
 		}
@@ -135,15 +134,23 @@
 		//However, right now it is not persistent. Therefore
 		//you would need to pass it to a setTimeOut function
 		//outside somewhere.
-		this.moveBarView = function () {
+		this.moveBarView = function (positive) {
 
 			var curX = this.container
-				.select(this.id)
-				.attr("x");
+				.select('#' + this.id)
+				.attr("x"),	
+			width = this.container
+				.attr("width"),
+			velocity = this.Bar.velocity;
 
 			this.container
-			.select(this.id)
-			.attr("x", curX + this.Bar.velocity.x);
+			.select('#' + this.id)
+			.attr("x", function() {
+				if(positive)
+					return Number(curX) + velocity.x * width;
+				else 
+					return Number(curX) - velocity.x * width;
+			});
 		}
 
 		return this;	
@@ -193,9 +200,9 @@
 			var ball = this.container
 				.append("circle")
 				.attr("id", this.id)
-				.attr("cx", this.Ball.position.x)
-				.attr("cy", this.Ball.position.y)
-				.attr("r", this.Ball.radius)
+				.attr("cx", this.Ball.position.x * width)
+				.attr("cy", this.Ball.position.y * height)
+				.attr("r", this.Ball.radius * width)
 				.attr("fill",'#900C3F');
 		}
 
@@ -266,26 +273,45 @@
 /* 4 */
 /***/ function(module, exports) {
 
-	function detectEvents(bar) {
+	function detectEvents(BarView) {
+		var last_event,
+		last_event_identifier;
+
 		d3.select('body')
 		.on('keydown', function() {
-
+			
+			if(last_event === 'keydown' && last_event_identifier === d3.event.keyIdentifier) {
+				return;
+			}
+			
 			switch(d3.event.keyIdentifier) {
 				case 'Right': 
 					console.log('The right key was clicked');
+					BarView.moveBarView(true);
+					
+					//TODO we would emit a socket event here.
 					break;
 				case 'Left':
 					console.log('The left key was clicked');
+					BarView.moveBarView(false);
+					
+					//TODO we would emit another socket event here. 
 					break;
 				default:
 					console.log("Key not identified");
 			}
+
+			last_event = 'keydown';
+			last_event_identifier = d3.event.keyIdentifier;
 		});
 
 		d3.select('body')
 		.on('keyup', function() {
 
 			console.log('Keyup happened');
+
+			last_event = 'keyup';
+			last_event_identifier = d3.event.keyIdentifier;
 
 		});
 

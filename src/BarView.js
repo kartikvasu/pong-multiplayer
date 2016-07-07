@@ -1,5 +1,4 @@
 var BarView = function (Bar, container, id) {
-
 	/**
 	 * TODO 
 	 * Checks for input values. Make sure every
@@ -41,10 +40,10 @@ var BarView = function (Bar, container, id) {
 		var bar = this.container
 			.append("rect")
 			.attr("id", this.id)
-			.attr("x", this.Bar.position.x)
-			.attr("y", this.Bar.position.y)
-			.attr("width", this.Bar.barWidth)
-			.attr("height", this.Bar.barHeight)
+			.attr("x", this.Bar.position.x * width)
+			.attr("y", this.Bar.position.y * height)
+			.attr("width", this.Bar.barWidth * width)
+			.attr("height", this.Bar.barHeight * height)
 			.attr("fill", '#900C3F');
 
 	}
@@ -53,15 +52,23 @@ var BarView = function (Bar, container, id) {
 	//However, right now it is not persistent. Therefore
 	//you would need to pass it to a setTimeOut function
 	//outside somewhere.
-	this.moveBarView = function () {
+	this.moveBarView = function (positive) {
 
 		var curX = this.container
-			.select(this.id)
-			.attr("x");
+			.select('#' + this.id)
+			.attr("x"),	
+		width = this.container
+			.attr("width"),
+		velocity = this.Bar.velocity;
 
 		this.container
-		.select(this.id)
-		.attr("x", curX + this.Bar.velocity.x);
+		.select('#' + this.id)
+		.attr("x", function() {
+			if(positive)
+				return Number(curX) + velocity.x * width;
+			else 
+				return Number(curX) - velocity.x * width;
+		});
 	}
 
 	return this;	
