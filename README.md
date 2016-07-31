@@ -10,7 +10,7 @@ TODO:
   <li>More error checking at the front-end. Could think about throwing exceptions.</li>
   <li>Setup event controllers.
     <ul> 
-    <li>Detect key events. </li> 
+    <li><strike>Detect key events. </strike></li> 
     <li>Emit socket events from the front-end.</li>
     <li>Detect socket events at the back-end.</li>
     <li>Update the entire game at the back-end.</li>
