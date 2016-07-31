@@ -19,7 +19,7 @@ var container = d3.select('#main');
 var game_view = new GameView(game, container, window.innerWidth * 0.8, window.innerHeight * 0.8),
     ball_view = new BallView(game.ball, container, 'ball'),
     player_view = new BarView(game.playerOneBar, container, 'player'),
-    opponent_view = new BarView(game.playerTwoBar, container, 'opponent');
+    opponent_view = new BarView(game.playerTwoBar, container, '#opponent');
 
 
 game_view.renderGameView();

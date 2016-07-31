@@ -5,9 +5,8 @@ function detectEvents(BarView) {
 	d3.select('body')
 	.on('keydown', function() {
 		
-		if(last_event === 'keydown' && last_event_identifier === d3.event.keyIdentifier) {
+		if(last_event === 'keydown' && last_event_identifier === d3.event.keyIdentifier) 
 			return;
-		}
 		
 		switch(d3.event.keyIdentifier) {
 			case 'Right': 
