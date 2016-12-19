@@ -7,7 +7,7 @@ TODO:
 <ul>
   <li><strike>Implement scaling stuff b/w back-end and front-end.</strike></li>
   <li>Figure out player-opponent distinction stuff at front-end.</li>
-  <li>More error checking at the front-end. Could think about throwing exceptions.</li>
+  <li><strike>More error checking at the front-end. Could think about throwing exceptions.</strike></li>
   <li>Setup event controllers.
     <ul> 
     <li><strike>Detect key events. </strike></li> 

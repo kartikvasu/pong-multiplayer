@@ -53,12 +53,12 @@
 	    //GameView object encapsulates rendering info for the game generally, including the layout on the front-end.
 	    GameView = __webpack_require__(3), 
 	    //manages key events and launches 
-	    eventControllers = __webpack_require__(4); 
+	    ubarController = __webpack_require__(4); 
 
 
 	 //TODO figure out a way to load the game from socket into this JS file.
 
-	var socket = io.connect('http://192.168.1.3:8000');
+	var socket = io.connect('http://localhost:8000/');
 
 	var game;
 
@@ -74,11 +74,17 @@
 	    opponent_view = new BarView(game.playerTwoBar, container, 'opponent');
 
 
+	/* Initialize views in position in the beginning. */
 	game_view.renderGameView();
 	player_view.renderBarView();
 	opponent_view.renderBarView();
 	ball_view.renderBallView();
-	eventControllers(player_view);
+
+	/* Register controllers with the views. */
+	var player_controller = new ubarController(player_view);
+	player_controller.keyListen();
+
+
 	});
 
 
@@ -279,51 +285,61 @@
 /* 4 */
 /***/ function(module, exports) {
 
-	function detectEvents(BarView) {
-		var last_event,
-		last_event_identifier;
+	var ubarController = function(BarView) {
+	    
+	    this.BarView = BarView;
+	    this.last_event = null;
+	    this.last_event_identifier = null;
 
-		d3.select('body')
-		.on('keydown', function() {
-			
-			if(last_event === 'keydown' && last_event_identifier === d3.event.keyIdentifier) 
-				return;
-			
-			switch(d3.event.keyIdentifier) {
-				case 'Right': 
-					console.log('The right key was clicked');
-					BarView.moveBarView(true);
-					
-					//TODO we would emit a socket event here.
-					break;
-				case 'Left':
-					console.log('The left key was clicked');
-					BarView.moveBarView(false);
-					
-					//TODO we would emit another socket event here. 
-					break;
-				default:
-					console.log("Key not identified");
-			}
+	    this.keyListen = function() {
+	        
+	        var controller = this;
+	        
+	        d3.select('body')
+	        .on('keydown', keyDown)
+	        .on('keyup', keyUp);
 
-			last_event = 'keydown';
-			last_event_identifier = d3.event.keyIdentifier;
-		});
+	        /* When a key is "upped" or lifted from pressing, this portion is fired. */
+	        function keyUp () {
+	            
+	            console.log('Keyup happened');
+	            controller.last_event = 'keyup';
+	            controller.last_event_identifier = d3.event.keyIdentifier;
 
-		d3.select('body')
-		.on('keyup', function() {
+	        }
 
-			console.log('Keyup happened');
+	        /* When a key is pressed this portion is fired */
+	        function keyDown () {
+	            if (controller.last_event === 'keydown' && controller.last_event_identifier === d3.event.keyIdentifier)
+	                return;
 
-			last_event = 'keyup';
-			last_event_identifier = d3.event.keyIdentifier;
+	            switch (d3.event.keyIdentifier) {
+	                case 'Right':
+	                    console.log('The right key was clicked');
+	                    controller.BarView.moveBarView(true);
 
-		});
+	                    //TODO we would emit a socket event here.
+	                    break;
+	                case 'Left':
+	                    console.log('The left key was clicked');
+	                    controller.BarView.moveBarView(false);
 
+	                    //TODO we would emit another socket event here. 
+	                    break;
+	                default:
+	                    console.log("Key not identified");
+	            }
+
+	            controller.last_event = 'keydown';
+	            controller.last_event_identifier = d3.event.keyIdentifier;
+	        }
+	        
+	    }
+
+	    return this;        
 	}
 
-	module.exports = detectEvents;
-
+	module.exports = ubarController;
 
 /***/ }
 /******/ ]);
