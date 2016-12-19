@@ -12,15 +12,15 @@ var Point = function (x, y) {
 
 	//type-checks for input variables.
 	if(arguments.length !== 2) {
-		console.log("Wrong number of inputs to Point constructor!");
+		console.error("Wrong number of inputs to Point constructor!");
 	}
 
 	if (typeof x !== "number" || typeof y !== "number") {
-		console.log("Input to Point constructor should be numbers.");
+		console.error("Input to Point constructor should be numbers.");
 	}
 
 	if(x < 0 || x > 1 || y < 0 || y > 1) {
-		console.log("Input variables must be between 0 and 1.");
+		console.error("Input variables must be between 0 and 1.");
 	}
 
 	this.x = x || 0;

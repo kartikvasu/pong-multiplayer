@@ -45,10 +45,16 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	
-	var BarView = __webpack_require__(1), //BarView object encapsulates rendering info for bar on the front-end.
-	    BallView = __webpack_require__(2), //BallView object encapsulates rendering info for the ball on the front-end.
-	    GameView = __webpack_require__(3), //GameView object encapsulates rendering info for the game generally, including the layout on the front-end.
-	    eventControllers = __webpack_require__(4); //manages key events and launches 
+	    
+	var //BarView object encapsulates rendering info for bar on the front-end.
+	    BarView = __webpack_require__(1),
+	    //BallView object encapsulates rendering info for the ball on the front-end.
+	    BallView = __webpack_require__(2), 
+	    //GameView object encapsulates rendering info for the game generally, including the layout on the front-end.
+	    GameView = __webpack_require__(3), 
+	    //manages key events and launches 
+	    eventControllers = __webpack_require__(4); 
+
 
 	 //TODO figure out a way to load the game from socket into this JS file.
 
@@ -65,7 +71,7 @@
 	var game_view = new GameView(game, container, window.innerWidth * 0.8, window.innerHeight * 0.8),
 	    ball_view = new BallView(game.ball, container, 'ball'),
 	    player_view = new BarView(game.playerOneBar, container, 'player'),
-	    opponent_view = new BarView(game.playerTwoBar, container, '#opponent');
+	    opponent_view = new BarView(game.playerTwoBar, container, 'opponent');
 
 
 	game_view.renderGameView();
@@ -101,7 +107,7 @@
 		this.container = container;
 
 		/**
-		 * The id of the svg rect element associated with
+		 * The id of the svg rectangle element associated with
 		 * this bar.
 		 */
 		this.id = id;

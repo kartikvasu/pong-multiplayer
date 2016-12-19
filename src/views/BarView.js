@@ -19,7 +19,7 @@ var BarView = function (Bar, container, id) {
 	this.container = container;
 
 	/**
-	 * The id of the svg rect element associated with
+	 * The id of the svg rectangle element associated with
 	 * this bar.
 	 */
 	this.id = id;
