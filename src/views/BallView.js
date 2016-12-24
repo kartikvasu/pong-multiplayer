@@ -59,6 +59,23 @@ var BallView = function (Ball, container, id) {
 			.attr("cy", curY + this.Ball.velocity.y * height);
 			
 	}
+
+	/* this function moves the ball to the passed in position. */
+	this.moveBallPosition = function(position) {
+		var width = this.container
+			.attr("width"),
+			height = this.container
+			.attr("height");
+
+			this.container
+			.select('#' + this.id)
+			.attr("cx", function() {
+				return position.x * width;
+			})
+			.attr("cy", function() {
+				return position.y * width;
+			});
+	}
 	
 	return this;
 }

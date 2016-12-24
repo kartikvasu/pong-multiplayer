@@ -21,6 +21,18 @@ function Ball (position, velocity, radius) {
 	this.velocity = velocity;
 	this.radius = radius;
 
+	this.moveBall = function(playerA, playerB) {
+		
+		if(Math.abs(1 - this.radius - this.position.x) < 0.0001 || Math.abs(this.radius - this.position.x) < 0.0001)
+			this.velocity.x = -this.velocity.x;
+		
+		if(Math.abs(1 - this.radius - this.position.y) < 0.001 || Math.abs(this.radius - this.position.y) < 0.0001)
+			this.velocity.y = -this.velocity.y;
+		
+		this.position.x += this.velocity.x;
+		this.position.y += this.velocity.y;
+	}
+
 	return this;
 }
 

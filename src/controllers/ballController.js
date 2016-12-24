@@ -10,6 +10,21 @@ The responsibilities of the ballController include:
 
 */
 
-var ballController = function() {
+var ballController = function(BallView, socket) {
     
+    this.BallView = BallView;
+    this.socket = socket;
+
+    this.socketEventListeners = function() {
+
+        var ballView = BallView;
+        this.socket.on('moveBall', function(position) {
+            ballView.moveBallPosition(position);
+        });
+
+    }
+
+    return this;
 }
+
+module.exports = ballController;

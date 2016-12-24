@@ -19,7 +19,7 @@ var gameOps = function(socket) {
 	this.ballVelocity = new Point(.00025, .00025);
 	this.playerAPosition = new Point(0.4, 0.985);
 	this.playerAVelocity = new Point(0.0005, 0);
-	this.playerBPosition = new Point(0.4, 0.05);
+	this.playerBPosition = new Point(0.4, 0.005);
 	this.playerBVelocity = new Point(0.0005, 0);
 
 	this.playerAmoveInterval = null;
@@ -48,11 +48,29 @@ var gameOps = function(socket) {
 	the front-end.
 	*/
 	this.runGame = function () {
+	
 		BarManager(this);
+		BallManager(this);
+	
 	}
 
-	/* This function manages all of the socket functionality of 
-	bars of *both* players. */
+	/* 
+	This function manages the ball movement functionality
+	*/
+	var BallManager = function(that) {
+		clearInterval(that.ballmoveInterval);
+
+		that.ballmoveInterval = setInterval(function() {
+			that.ball.moveBall(that.playerA, that.playerB);
+			socket.emit('moveBall', that.ball.position);
+		}, 1);
+		
+	}
+
+	/* 
+	This function manages all of the socket functionality of 
+	bars of *both* players. 
+	*/
 	var BarManager = function(that) {
 		var players = {
 			'A': that.playerA,

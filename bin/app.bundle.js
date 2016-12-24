@@ -53,8 +53,8 @@
 	    //GameView object encapsulates rendering info for the game generally, including the layout on the front-end.
 	    GameView = __webpack_require__(3), 
 	    //manages key events and launches 
-	    ubarController = __webpack_require__(4); 
-
+	    ubarController = __webpack_require__(4), 
+	    ballController = __webpack_require__(5)
 
 	 //TODO figure out a way to load the game from socket into this JS file.
 
@@ -69,7 +69,7 @@
 	var container = d3.select('#main');
 
 	/* Initialize all the views. */
-	var game_view = new GameView(game, container, window.innerWidth * 0.8, window.innerHeight * 0.8),
+	var game_view = new GameView(game, container, window.innerHeight * 0.8, window.innerHeight * 0.8),
 	    ball_view = new BallView(game.ball, container, 'ball'),
 	    player_view = new BarView(game.playerOneBar, container, 'player'),
 	    opponent_view = new BarView(game.playerTwoBar, container, 'opponent');
@@ -85,10 +85,8 @@
 	var player_controller = new ubarController(player_view, 'A', socket);
 	player_controller.keyListen();
 	player_controller.socketEventListeners();
-
-	var interval = setInterval(function() {
-	    ball_view.moveBall();
-	}, 1);
+	ball_controller = new ballController(ball_view, socket);
+	ball_controller.socketEventListeners();
 
 	});
 
@@ -242,6 +240,23 @@
 				.attr("cy", curY + this.Ball.velocity.y * height);
 				
 		}
+
+		/* this function moves the ball to the passed in position. */
+		this.moveBallPosition = function(position) {
+			var width = this.container
+				.attr("width"),
+				height = this.container
+				.attr("height");
+
+				this.container
+				.select('#' + this.id)
+				.attr("cx", function() {
+					return position.x * width;
+				})
+				.attr("cy", function() {
+					return position.y * width;
+				});
+		}
 		
 		return this;
 	}
@@ -379,6 +394,41 @@
 	}
 
 	module.exports = ubarController;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	/*
+
+	The responsibilities of the ballController include:
+
+	    1. Listening to backend updates to update the ball's velocity
+	    on the front-end.
+	    (The general idea now is to make sure that the backend alone
+	    knows about collisions changes in velocity so it can 'tell'
+	    the front-end)
+
+	*/
+
+	var ballController = function(BallView, socket) {
+	    
+	    this.BallView = BallView;
+	    this.socket = socket;
+
+	    this.socketEventListeners = function() {
+
+	        var ballView = BallView;
+	        this.socket.on('moveBall', function(position) {
+	            ballView.moveBallPosition(position);
+	        });
+
+	    }
+
+	    return this;
+	}
+
+	module.exports = ballController;
 
 /***/ }
 /******/ ]);
