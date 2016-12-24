@@ -1,8 +1,19 @@
+/*
+
+The responsibilities of the ubarController include:
+
+    1. Listening to key entries by users on the front-end.
+    2. Syncing the frontend with the backend:
+        - Updating the barview for the user. 
+        - Updating the backend with the new "position".
+
+*/
 var ubarController = function(BarView) {
     
     this.BarView = BarView;
     this.last_event = null;
     this.last_event_identifier = null;
+    this.moveInterval = null;
 
     this.keyListen = function() {
         
@@ -15,6 +26,7 @@ var ubarController = function(BarView) {
         /* When a key is "upped" or lifted from pressing, this portion is fired. */
         function keyUp () {
             
+            clearInterval(this.moveInterval);
             console.log('Keyup happened');
             controller.last_event = 'keyup';
             controller.last_event_identifier = d3.event.keyIdentifier;
@@ -23,20 +35,27 @@ var ubarController = function(BarView) {
 
         /* When a key is pressed this portion is fired */
         function keyDown () {
-            if (controller.last_event === 'keydown' && controller.last_event_identifier === d3.event.keyIdentifier)
+
+            if (controller.last_event === 'keydown' && controller.last_event_identifier === d3.event.key)
                 return;
 
-            switch (d3.event.keyIdentifier) {
-                case 'Right':
-                    console.log('The right key was clicked');
-                    controller.BarView.moveBarView(true);
+            switch (d3.event.key) {
+                case 'ArrowRight':
+                    if(controller.last_event_identifier === 'ArrowLeft')
+                        clearInterval(this.moveInterval);
 
+                    this.moveInterval = setInterval(function() {
+                        controller.BarView.moveBarView(true);
+                    }, 1);
                     //TODO we would emit a socket event here.
                     break;
-                case 'Left':
-                    console.log('The left key was clicked');
-                    controller.BarView.moveBarView(false);
+                case 'ArrowLeft':
+                    if(controller.last_event_identifier === 'ArrowRight')
+                        clearInterval(this.moveInterval);
 
+                    this.moveInterval = setInterval(function() {
+                        controller.BarView.moveBarView(false);
+                    }, 1);
                     //TODO we would emit another socket event here. 
                     break;
                 default:
@@ -44,7 +63,8 @@ var ubarController = function(BarView) {
             }
 
             controller.last_event = 'keydown';
-            controller.last_event_identifier = d3.event.keyIdentifier;
+            controller.last_event_identifier = d3.event.key;
+        
         }
         
     }

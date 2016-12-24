@@ -1,11 +1,5 @@
 var BarView = function (Bar, container, id) {
-	/**
-	 * TODO 
-	 * Checks for input values. Make sure every
-	 * input variable is clean before starting
-	 * assignments.
-	 */
-
+	
 	/**
 	 * This is the bar associated with this particular
 	 * barView.
@@ -49,9 +43,7 @@ var BarView = function (Bar, container, id) {
 	}
 
 	//this function moves the bar by the velocity.
-	//However, right now it is not persistent. Therefore
-	//you would need to pass it to a setTimeOut function
-	//outside somewhere.
+	//It is called in setInterval(s) from the bar controller.
 	this.moveBarView = function (positive) {
 
 		var curX = this.container

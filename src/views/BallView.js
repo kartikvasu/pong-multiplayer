@@ -26,6 +26,7 @@ var BallView = function (Ball, container, id) {
 
 	this.renderBallView = function () {
 
+		//for scaling
 		var width = this.container.attr("width"),
 		height = this.container.attr("height");
 
@@ -42,20 +43,21 @@ var BallView = function (Ball, container, id) {
 	}
 
 	//this function moves the ballView by the velocity.
-	//However, right now it is not persistent. Therefore
-	//you would need to pass it to a setInterval function
-	//from outside somewhere.  The app.js (main) js file
-	//in src, would be ideal.
-	function moveBall  () {
+	//It is called in setInterval(s) from the main.js script.
+	this.moveBall = function () {
+
+		//for scaling
+		var width = this.container.attr("width"),
+		height = this.container.attr("height");
+
+		var selection = this.container.select('#' + this.id);
+
+		var curX = Number(selection.attr("cx")),
+		curY = Number(selection.attr("cy"));
 		
-		var selection = this.container.select(this.id);
-
-		var curX = selection.attr("cx"),
-		curY = selection.attr("cy");
-
-		selection.attr("x", curX + this.Ball.velocity.x)
-			.attr("y", curY + this.Ball.velocity.y);
-	
+		selection.attr("cx", curX + this.Ball.velocity.x * width)
+			.attr("cy", curY + this.Ball.velocity.y * height);
+			
 	}
 	
 	return this;

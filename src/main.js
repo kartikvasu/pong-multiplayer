@@ -22,6 +22,7 @@ socket.on('load', function(a_game) {
 
 var container = d3.select('#main');
 
+/* Initialize all the views. */
 var game_view = new GameView(game, container, window.innerWidth * 0.8, window.innerHeight * 0.8),
     ball_view = new BallView(game.ball, container, 'ball'),
     player_view = new BarView(game.playerOneBar, container, 'player'),
@@ -38,5 +39,8 @@ ball_view.renderBallView();
 var player_controller = new ubarController(player_view);
 player_controller.keyListen();
 
+var interval = setInterval(function() {
+    ball_view.moveBall();
+}, 1);
 
 });

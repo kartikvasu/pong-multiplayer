@@ -12,15 +12,14 @@ app.use(express.static(__dirname));
 app.use('/scripts', express.static(__dirname + '/node_modules/'));
 
 server.listen(port, function (err) {
-
 	if(!err) console.log('Listening on: ' + port);
-
 });
 
 
 socket.on('connection', function(socket) {
 	
-	var game = gameOps.initGame();
-	socket.emit('load', game);
+	var game = new gameOps();
+	socket.emit('load', game.initGame());
+    game.runGame();
 
 });

@@ -23,4 +23,5 @@ function Ball (position, velocity, radius) {
 
 	return this;
 }
+
 module.exports = Ball;

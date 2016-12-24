@@ -1,3 +1,8 @@
+/*
+This is the rendering of the game view. In the future we will
+probably end up putting customizations for the whole "arena"
+here.
+*/
 function GameView(Game, container, width, height) {
 
 	/*
