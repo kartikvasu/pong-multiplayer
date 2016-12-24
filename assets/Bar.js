@@ -24,6 +24,25 @@ function Bar (position, velocity, barWidth, barHeight) {
 	this.barWidth = barWidth;
 	this.barHeight = barHeight;
 
+	/* this is to move the bar by the velocity.
+	It is called within a setInterval function
+	somewhere from the outside. */
+	this.moveBar = function(direction) {
+
+		switch (direction) {
+			case 'left':
+				this.position.x -= this.velocity.x;
+				break;
+			case 'right':
+				this.position.x += this.velocity.x;
+				break;
+			default:
+				console.error('You can only move left or right, fam');
+				break;
+		}
+	
+	}
+
 	return this;
 }
 

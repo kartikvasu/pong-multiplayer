@@ -8,29 +8,43 @@ The responsibilities of the ubarController include:
         - Updating the backend with the new "position".
 
 */
-var ubarController = function(BarView) {
+var ubarController = function(BarView, playerID, socket) {
     
+    this.socket = socket;
+    this.playerID = playerID;
     this.BarView = BarView;
     this.last_event = null;
     this.last_event_identifier = null;
-    this.moveInterval = null;
 
+    /* Listens for socket events from the back-end and
+    updates the view according to the emitted socket events.
+    */
+    this.socketEventListeners = function() {
+        
+        var BarView = this.BarView;
+        this.socket.on('move' + this.playerID, function(position) {
+            BarView.moveBarViewPosition(position);
+        });
+
+    }
+
+    /* Setting up the key-listen actions for waiting on 
+    user interactions on the front end. */
     this.keyListen = function() {
-        
-        var controller = this;
-        
+                
         d3.select('body')
         .on('keydown', keyDown)
         .on('keyup', keyUp);
 
+        var controller = this;
+
         /* When a key is "upped" or lifted from pressing, this portion is fired. */
         function keyUp () {
-            
-            clearInterval(this.moveInterval);
-            console.log('Keyup happened');
+
+            controller.socket.emit('keyup', controller.playerID);
             controller.last_event = 'keyup';
             controller.last_event_identifier = d3.event.keyIdentifier;
-
+        
         }
 
         /* When a key is pressed this portion is fired */
@@ -40,26 +54,18 @@ var ubarController = function(BarView) {
                 return;
 
             switch (d3.event.key) {
-                case 'ArrowRight':
-                    if(controller.last_event_identifier === 'ArrowLeft')
-                        clearInterval(this.moveInterval);
 
-                    this.moveInterval = setInterval(function() {
-                        controller.BarView.moveBarView(true);
-                    }, 1);
-                    //TODO we would emit a socket event here.
+                case 'ArrowRight':                   
+                    controller.socket.emit('pressRight', controller.playerID);
                     break;
+
                 case 'ArrowLeft':
-                    if(controller.last_event_identifier === 'ArrowRight')
-                        clearInterval(this.moveInterval);
-
-                    this.moveInterval = setInterval(function() {
-                        controller.BarView.moveBarView(false);
-                    }, 1);
-                    //TODO we would emit another socket event here. 
+                    controller.socket.emit('pressLeft', controller.playerID);                    
                     break;
+
                 default:
-                    console.log("Key not identified");
+                    console.error('Key not identified');
+            
             }
 
             controller.last_event = 'keydown';

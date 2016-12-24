@@ -36,8 +36,9 @@ opponent_view.renderBarView();
 ball_view.renderBallView();
 
 /* Register controllers with the views. */
-var player_controller = new ubarController(player_view);
+var player_controller = new ubarController(player_view, 'A', socket);
 player_controller.keyListen();
+player_controller.socketEventListeners();
 
 var interval = setInterval(function() {
     ball_view.moveBall();

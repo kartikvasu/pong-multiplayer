@@ -18,7 +18,7 @@ server.listen(port, function (err) {
 
 socket.on('connection', function(socket) {
 	
-	var game = new gameOps();
+	var game = new gameOps(socket);
 	socket.emit('load', game.initGame());
     game.runGame();
 

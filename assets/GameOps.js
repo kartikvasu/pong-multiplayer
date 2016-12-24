@@ -11,7 +11,9 @@ var Game = require('./Game'),
     Point = require('./Point'),
     Ball = require('./Ball');
 
-var gameOps = function() {
+var gameOps = function(socket) {
+
+	this.socket = socket;
 
 	this.ballPosition = new Point(0.5, 0.5);
 	this.ballVelocity = new Point(.00025, .00025);
@@ -19,6 +21,10 @@ var gameOps = function() {
 	this.playerAVelocity = new Point(0.0005, 0);
 	this.playerBPosition = new Point(0.4, 0.05);
 	this.playerBVelocity = new Point(0.0005, 0);
+
+	this.playerAmoveInterval = null;
+	this.playerBmoveInterval = null;
+	this.ballmoveInterval = null;
 
 	this.ball = null;
 	this.playerA = null;
@@ -42,7 +48,52 @@ var gameOps = function() {
 	the front-end.
 	*/
 	this.runGame = function () {
+		BarManager(this);
+	}
+
+	/* This function manages all of the socket functionality of 
+	bars of *both* players. */
+	var BarManager = function(that) {
+		var players = {
+			'A': that.playerA,
+			'B': that.playerB
+		},
 		
+		intervals = {
+			'A': that.playerAmoveInterval,
+			'B': that.playerBmoveInterval
+		},
+
+		socket = that.socket;
+
+		/* stuff to be done when a key is pressed. */
+		var move = function(playerID, direction) {
+
+			for(var ID in intervals)
+				clearInterval(intervals[ID]);
+			
+			intervals[playerID] = setInterval(function() {
+				players[playerID].moveBar(direction);
+				socket.emit('move' + playerID, players[playerID].position);
+			}, 1);
+
+		}
+
+		/* stuff to be done when a key is no longer being pressed. */
+		var stop = function(playerID) {
+			for (var ID in intervals) 
+				clearInterval(intervals[ID]);
+		}
+
+		socket.on('pressRight', function(playerID) {		
+			move(playerID, 'right');
+		});
+
+		socket.on('pressLeft', function(playerID) {
+			move(playerID, 'left');
+		});
+
+		socket.on('keyup', stop);
 	}
 
 	return this;

@@ -82,8 +82,9 @@
 	ball_view.renderBallView();
 
 	/* Register controllers with the views. */
-	var player_controller = new ubarController(player_view);
+	var player_controller = new ubarController(player_view, 'A', socket);
 	player_controller.keyListen();
+	player_controller.socketEventListeners();
 
 	var interval = setInterval(function() {
 	    ball_view.moveBall();
@@ -98,26 +99,20 @@
 
 	var BarView = function (Bar, container, id) {
 		
-		/**
-		 * This is the bar associated with this particular
-		 * barView.
-		 */
+		/* This is the bar associated with this particular
+		barView. */
 		this.Bar = Bar;
 
-		/**
-		 * This is a d3 style selection of the container
-		 * into which the bar is to be rendered. 
-		 */
+		/* This is a d3 style selection of the container into 
+		which the bar is to be rendered. */
 		this.container = container;
 
-		/**
-		 * The id of the svg rectangle element associated with
-		 * this bar.
-		 */
+		/* The id of the svg rectangle element associated with 
+		this bar. */
 		this.id = id;
 
-		//this function renders the barView 
-		//according to the specification provided. 
+		/* This function renders the barView according to the 
+		specification provided. */ 
 		this.renderBarView = function () {
 
 			var width = this.container.attr("width"),
@@ -125,10 +120,7 @@
 
 			var barWidth = 0.2 * width,
 			barHeight = 0.02 * height;
-		
-			//TODO make sure that the position
-			//and sizes and everything are scaled
-			//before deploy. VERY IMPORTANT!	
+				
 			var bar = this.container
 				.append("rect")
 				.attr("id", this.id)
@@ -140,8 +132,8 @@
 
 		}
 
-		//this function moves the bar by the velocity.
-		//It is called in setInterval(s) from the bar controller.
+		/* This function moves the bar by the velocity. It is 
+		called in setInterval(s) from the bar controller. */
 		this.moveBarView = function (positive) {
 
 			var curX = this.container
@@ -161,7 +153,25 @@
 			});
 		}
 
-		return this;	
+		/* This function moves the bar to the passed in position. */
+		this.moveBarViewPosition = function (position) {
+			var width = this.container
+				.attr("width"),
+				height = this.container
+				.attr("height");
+
+			this.container
+			.select('#' + this.id)
+			.attr("x", function() {
+				return position.x * width;
+			})
+			.attr("y", function() {
+				return position.y * height;
+			});
+		} 
+
+		return this;
+
 	}
 
 	module.exports = BarView;
@@ -298,29 +308,43 @@
 	        - Updating the backend with the new "position".
 
 	*/
-	var ubarController = function(BarView) {
+	var ubarController = function(BarView, playerID, socket) {
 	    
+	    this.socket = socket;
+	    this.playerID = playerID;
 	    this.BarView = BarView;
 	    this.last_event = null;
 	    this.last_event_identifier = null;
-	    this.moveInterval = null;
 
+	    /* Listens for socket events from the back-end and
+	    updates the view according to the emitted socket events.
+	    */
+	    this.socketEventListeners = function() {
+	        
+	        var BarView = this.BarView;
+	        this.socket.on('move' + this.playerID, function(position) {
+	            BarView.moveBarViewPosition(position);
+	        });
+
+	    }
+
+	    /* Setting up the key-listen actions for waiting on 
+	    user interactions on the front end. */
 	    this.keyListen = function() {
-	        
-	        var controller = this;
-	        
+	                
 	        d3.select('body')
 	        .on('keydown', keyDown)
 	        .on('keyup', keyUp);
 
+	        var controller = this;
+
 	        /* When a key is "upped" or lifted from pressing, this portion is fired. */
 	        function keyUp () {
-	            
-	            clearInterval(this.moveInterval);
-	            console.log('Keyup happened');
+
+	            controller.socket.emit('keyup', controller.playerID);
 	            controller.last_event = 'keyup';
 	            controller.last_event_identifier = d3.event.keyIdentifier;
-
+	        
 	        }
 
 	        /* When a key is pressed this portion is fired */
@@ -330,26 +354,18 @@
 	                return;
 
 	            switch (d3.event.key) {
-	                case 'ArrowRight':
-	                    if(controller.last_event_identifier === 'ArrowLeft')
-	                        clearInterval(this.moveInterval);
 
-	                    this.moveInterval = setInterval(function() {
-	                        controller.BarView.moveBarView(true);
-	                    }, 1);
-	                    //TODO we would emit a socket event here.
+	                case 'ArrowRight':                   
+	                    controller.socket.emit('pressRight', controller.playerID);
 	                    break;
+
 	                case 'ArrowLeft':
-	                    if(controller.last_event_identifier === 'ArrowRight')
-	                        clearInterval(this.moveInterval);
-
-	                    this.moveInterval = setInterval(function() {
-	                        controller.BarView.moveBarView(false);
-	                    }, 1);
-	                    //TODO we would emit another socket event here. 
+	                    controller.socket.emit('pressLeft', controller.playerID);                    
 	                    break;
+
 	                default:
-	                    console.log("Key not identified");
+	                    console.error('Key not identified');
+	            
 	            }
 
 	            controller.last_event = 'keydown';
