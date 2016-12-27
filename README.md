@@ -11,10 +11,10 @@ TODO:
   <li>Setup event controllers.
     <ul> 
     <li><strike>Detect key events. </strike></li> 
-    <li>Emit socket events from the front-end.</li>
+    <li><strike>Emit socket events from the front-end. </strike></li>
     <li>Detect socket events at the back-end.</li>
     <li>Update the entire game at the back-end.</li>
-    <li>Push changes to players at the front-end.</li>
+    <li><strike>Push changes to players at the front-end.</strike></li>
     </ul>
   </li>
 <ul>
