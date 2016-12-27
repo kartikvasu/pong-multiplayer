@@ -1,12 +1,10 @@
-
-    
 var //BarView object encapsulates rendering info for bar on the front-end.
     BarView = require('./views/BarView'),
     //BallView object encapsulates rendering info for the ball on the front-end.
     BallView = require('./views/BallView'), 
     //GameView object encapsulates rendering info for the game generally, including the layout on the front-end.
     GameView = require('./views/GameView'), 
-    //manages key events and launches 
+    //controllers
     ubarController = require('./controllers/ubarController'), 
     ballController = require('./controllers/ballController')
 
@@ -35,7 +33,7 @@ player_view.renderBarView();
 opponent_view.renderBarView();
 ball_view.renderBallView();
 
-/* Register controllers with the views. */
+/* Initialize all the controllers. */
 var player_controller = new ubarController(player_view, 'A', socket);
 player_controller.keyListen();
 player_controller.socketEventListeners();

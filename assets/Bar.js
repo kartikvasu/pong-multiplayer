@@ -29,12 +29,16 @@ function Bar (position, velocity, barWidth, barHeight) {
 	somewhere from the outside. */
 	this.moveBar = function(direction) {
 
+		var LEFT_BOUND = 0, RIGHT_BOUND = 1;
+
 		switch (direction) {
 			case 'left':
-				this.position.x -= this.velocity.x;
+				if(Math.abs(this.position.x - LEFT_BOUND) > 0.0001)
+					this.position.x -= this.velocity.x;
 				break;
 			case 'right':
-				this.position.x += this.velocity.x;
+				if(Math.abs(this.position.x + this.barWidth - RIGHT_BOUND) > 0.0001)
+					this.position.x += this.velocity.x;
 				break;
 			default:
 				console.error('You can only move left or right, fam');

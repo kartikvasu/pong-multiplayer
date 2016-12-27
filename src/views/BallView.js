@@ -40,6 +40,7 @@ var BallView = function (Ball, container, id) {
 			.attr("cy", this.Ball.position.y * height)
 			.attr("r", this.Ball.radius * width)
 			.attr("fill",'#900C3F');
+			
 	}
 
 	//this function moves the ballView by the velocity.

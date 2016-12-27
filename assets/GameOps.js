@@ -16,7 +16,7 @@ var gameOps = function(socket) {
 	this.socket = socket;
 
 	this.ballPosition = new Point(0.5, 0.5);
-	this.ballVelocity = new Point(.00025, .00025);
+	this.ballVelocity = new Point(0, .00025);
 	this.playerAPosition = new Point(0.4, 0.985);
 	this.playerAVelocity = new Point(0.0005, 0);
 	this.playerBPosition = new Point(0.4, 0.005);
