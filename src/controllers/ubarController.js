@@ -50,20 +50,22 @@ var ubarController = function(BarView, playerID, socket) {
         /* When a key is pressed this portion is fired */
         function keyDown () {
 
-            if (controller.last_event === 'keydown' && controller.last_event_identifier === d3.event.key)
+            if (controller.last_event === 'keydown' && controller.last_event_identifier === d3.event.keyCode)
                 return;
 
-            switch (d3.event.key) {
+            switch (d3.event.keyCode) {
 
-                case 'ArrowRight':                   
+                case 39:                   
                     controller.socket.emit('pressRight', controller.playerID);
                     break;
 
-                case 'ArrowLeft':
+                case 37:
                     controller.socket.emit('pressLeft', controller.playerID);                    
                     break;
 
                 default:
+                    console.log(d3.event.key)
+                    console.log(d3.event.keyCode)
                     console.error('Key not identified');
             
             }

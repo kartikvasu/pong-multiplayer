@@ -8,11 +8,26 @@ var //BarView object encapsulates rendering info for bar on the front-end.
     ubarController = require('./controllers/ubarController'), 
     ballController = require('./controllers/ballController')
 
- //TODO figure out a way to load the game from socket into this JS file.
 
-var socket = io.connect('http://localhost:8000/');
+var socket = io.connect('192.168.1.8:8000/');
 
 var game;
+
+socket.on('onconnected', function( data ) {
+    console.log('Connected successfully to the server, my ID is: ' + data.id + '\n');
+    for(var i = 0; i < data.clients.length; i++) {
+        if(data.clients[i] !== data.id)
+            d3.select('#selectPlayers').append('div').attr("id", "u" + data.clients[i]).html(data.clients[i]);
+    }
+})
+
+socket.on('newconnection', function( data ) {
+    d3.select('#selectPlayers').append('div').attr("id", "u" + data).html(data);
+})
+
+socket.on('disconnectedclient', function( data ) {
+    d3.select('#' + "u" + String(data)).remove();
+})
 
 socket.on('load', function(a_game) {
 	console.log(a_game);

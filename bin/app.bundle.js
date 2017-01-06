@@ -44,23 +44,37 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	
-	    
 	var //BarView object encapsulates rendering info for bar on the front-end.
 	    BarView = __webpack_require__(1),
 	    //BallView object encapsulates rendering info for the ball on the front-end.
 	    BallView = __webpack_require__(2), 
 	    //GameView object encapsulates rendering info for the game generally, including the layout on the front-end.
 	    GameView = __webpack_require__(3), 
-	    //manages key events and launches 
+	    //controllers
 	    ubarController = __webpack_require__(4), 
 	    ballController = __webpack_require__(5)
 
 	 //TODO figure out a way to load the game from socket into this JS file.
 
-	var socket = io.connect('http://localhost:8000/');
+	var socket = io.connect('192.168.1.8:8000/');
 
 	var game;
+
+	socket.on('onconnected', function( data ) {
+	    console.log('Connected successfully to the server, my ID is: ' + data.id + '\n');
+	    for(var i = 0; i < data.clients.length; i++) {
+	        if(data.clients[i] !== data.id)
+	            d3.select('#selectPlayers').append('div').attr("id", "u" + data.clients[i]).html(data.clients[i]);
+	    }
+	})
+
+	socket.on('newconnection', function( data ) {
+	    d3.select('#selectPlayers').append('div').attr("id", "u" + data).html(data);
+	})
+
+	socket.on('disconnectedclient', function( data ) {
+	    d3.select('#' + "u" + String(data)).remove();
+	})
 
 	socket.on('load', function(a_game) {
 		console.log(a_game);
@@ -81,7 +95,7 @@
 	opponent_view.renderBarView();
 	ball_view.renderBallView();
 
-	/* Register controllers with the views. */
+	/* Initialize all the controllers. */
 	var player_controller = new ubarController(player_view, 'A', socket);
 	player_controller.keyListen();
 	player_controller.socketEventListeners();
@@ -221,6 +235,7 @@
 				.attr("cy", this.Ball.position.y * height)
 				.attr("r", this.Ball.radius * width)
 				.attr("fill",'#900C3F');
+				
 		}
 
 		//this function moves the ballView by the velocity.
@@ -365,20 +380,22 @@
 	        /* When a key is pressed this portion is fired */
 	        function keyDown () {
 
-	            if (controller.last_event === 'keydown' && controller.last_event_identifier === d3.event.key)
+	            if (controller.last_event === 'keydown' && controller.last_event_identifier === d3.event.keyCode)
 	                return;
 
-	            switch (d3.event.key) {
+	            switch (d3.event.keyCode) {
 
-	                case 'ArrowRight':                   
+	                case 39:                   
 	                    controller.socket.emit('pressRight', controller.playerID);
 	                    break;
 
-	                case 'ArrowLeft':
+	                case 37:
 	                    controller.socket.emit('pressLeft', controller.playerID);                    
 	                    break;
 
 	                default:
+	                    console.log(d3.event.key)
+	                    console.log(d3.event.keyCode)
 	                    console.error('Key not identified');
 	            
 	            }
