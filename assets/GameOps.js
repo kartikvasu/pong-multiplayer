@@ -11,16 +11,10 @@ var Game = require('./Game'),
     Point = require('./Point'),
     Ball = require('./Ball');
 
-var gameOps = function(socket) {
+var gameOps = function(clientA, clientB) {
 
-	this.socket = socket;
-
-	this.ballPosition = new Point(0.5, 0.5);
-	this.ballVelocity = new Point(0, .00025);
-	this.playerAPosition = new Point(0.4, 0.985);
-	this.playerAVelocity = new Point(0.0005, 0);
-	this.playerBPosition = new Point(0.4, 0.005);
-	this.playerBVelocity = new Point(0.0005, 0);
+	this.clientA = clientA;
+	this.clientB = clientB;
 
 	this.playerAmoveInterval = null;
 	this.playerBmoveInterval = null;
@@ -32,10 +26,18 @@ var gameOps = function(socket) {
 	this.Game = null;
 
 	this.initGame = function () {
+
+		// initial positions and velocities of everything
+		var ballPosition = new Point(0.5, 0.5),
+		ballVelocity = new Point(0, .00025),
+		playerAPosition = new Point(0.4, 0.985),
+		playerAVelocity = new Point(0.0005, 0),
+		playerBPosition = new Point(0.4, 0.005),
+		playerBVelocity = new Point(0.0005, 0);
 		
-		this.ball = new Ball(this.ballPosition, this.ballVelocity, 0.01),
-		this.playerA = new Bar(this.playerAPosition, this.playerAVelocity, 0.2, 0.01),
-		this.playerB = new Bar(this.playerBPosition, this.playerBVelocity, 0.2, 0.01);
+		this.ball = new Ball(ballPosition, ballVelocity, 0.01),
+		this.playerA = new Bar(playerAPosition, playerAVelocity, 0.2, 0.01),
+		this.playerB = new Bar(playerBPosition, playerBVelocity, 0.2, 0.01);
 
 		this.game = new Game(this.playerA, this.playerB, this.ball);
 
@@ -62,7 +64,8 @@ var gameOps = function(socket) {
 
 		that.ballmoveInterval = setInterval(function() {
 			that.ball.moveBall(that.playerA, that.playerB);
-			socket.emit('moveBall', that.ball.position);
+			that.clientA.emit('moveBall', that.ball.position);
+			that.clientB.emit('moveBall', that.ball.position);
 		}, 1);
 		
 	}
@@ -82,7 +85,8 @@ var gameOps = function(socket) {
 			'B': that.playerBmoveInterval
 		},
 
-		socket = that.socket;
+		clientA = that.clientA;
+		clientB = that.clientB;
 
 		/* stuff to be done when a key is pressed. */
 		var move = function(playerID, direction) {
@@ -92,7 +96,8 @@ var gameOps = function(socket) {
 			
 			intervals[playerID] = setInterval(function() {
 				players[playerID].moveBar(direction);
-				socket.emit('move' + playerID, players[playerID].position);
+				clientA.emit('move' + playerID, players[playerID].position);
+				clientB.emit('move' + playerID, players[playerID].position);
 			}, 1);
 
 		}
@@ -103,15 +108,25 @@ var gameOps = function(socket) {
 				clearInterval(intervals[ID]);
 		}
 
-		socket.on('pressRight', function(playerID) {		
+		clientA.on('pressRight', function(playerID) {		
 			move(playerID, 'right');
 		});
 
-		socket.on('pressLeft', function(playerID) {
+		clientA.on('pressLeft', function(playerID) {
 			move(playerID, 'left');
 		});
 
-		socket.on('keyup', stop);
+		clientA.on('keyup', stop);
+
+		clientB.on('pressRight', function(playerID) {		
+			move(playerID, 'right');
+		});
+
+		clientB.on('pressLeft', function(playerID) {
+			move(playerID, 'left');
+		});
+
+		clientB.on('keyup', stop);
 	}
 
 	return this;

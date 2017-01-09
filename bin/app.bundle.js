@@ -52,29 +52,18 @@
 	    GameView = __webpack_require__(3), 
 	    //controllers
 	    ubarController = __webpack_require__(4), 
-	    ballController = __webpack_require__(5)
+	    ballController = __webpack_require__(5),
+	    gameSetup = __webpack_require__(6);
 
-	 //TODO figure out a way to load the game from socket into this JS file.
 
 	var socket = io.connect('192.168.1.8:8000/');
 
 	var game;
 
-	socket.on('onconnected', function( data ) {
-	    console.log('Connected successfully to the server, my ID is: ' + data.id + '\n');
-	    for(var i = 0; i < data.clients.length; i++) {
-	        if(data.clients[i] !== data.id)
-	            d3.select('#selectPlayers').append('div').attr("id", "u" + data.clients[i]).html(data.clients[i]);
-	    }
-	})
+	//after the game is setup, maybe it takes a callback? work in progress
+	var setup = gameSetup( socket );
 
-	socket.on('newconnection', function( data ) {
-	    d3.select('#selectPlayers').append('div').attr("id", "u" + data).html(data);
-	})
-
-	socket.on('disconnectedclient', function( data ) {
-	    d3.select('#' + "u" + String(data)).remove();
-	})
+	var clientID = setup.ID;
 
 	socket.on('load', function(a_game) {
 		console.log(a_game);
@@ -96,7 +85,7 @@
 	ball_view.renderBallView();
 
 	/* Initialize all the controllers. */
-	var player_controller = new ubarController(player_view, 'A', socket);
+	var player_controller = new ubarController(player_view, clientID, socket);
 	player_controller.keyListen();
 	player_controller.socketEventListeners();
 	ball_controller = new ballController(ball_view, socket);
@@ -446,6 +435,54 @@
 	}
 
 	module.exports = ballController;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	var gameSetup = ( socket ) => {
+
+	    this.ID = "";
+
+	    socket.on('onconnected', function( data ) {
+	        
+	        this.ID = data['id'];
+
+	        for(var id in data.clients) {
+
+	            if(id !== data['id']) {
+
+	                d3.select('#selectPlayers')
+	                .append('div')
+	                .attr('id', 'u' + data.clients[id]['id'])
+	                .html(data.clients[id]['id']);
+	           
+
+	            }
+
+	        }
+
+	    })
+
+	    socket.on('newConnection', function( data ) {
+
+	            d3.select('#selectPlayers')
+	            .append('div')
+	            .attr("id", "u" + data['id'])
+	            .html(data['id']);
+
+	    })
+
+	    socket.on('disconnectedClient', function( data ) {
+
+	        d3.select('#' + "u" + String(data['id'])).remove();
+
+	    })  
+
+	    return this;
+	}
+
+	module.exports = gameSetup;
 
 /***/ }
 /******/ ]);

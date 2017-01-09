@@ -6,28 +6,18 @@ var //BarView object encapsulates rendering info for bar on the front-end.
     GameView = require('./views/GameView'), 
     //controllers
     ubarController = require('./controllers/ubarController'), 
-    ballController = require('./controllers/ballController')
+    ballController = require('./controllers/ballController'),
+    gameSetup = require('./game-setup');
 
 
 var socket = io.connect('192.168.1.8:8000/');
 
 var game;
 
-socket.on('onconnected', function( data ) {
-    console.log('Connected successfully to the server, my ID is: ' + data.id + '\n');
-    for(var i = 0; i < data.clients.length; i++) {
-        if(data.clients[i] !== data.id)
-            d3.select('#selectPlayers').append('div').attr("id", "u" + data.clients[i]).html(data.clients[i]);
-    }
-})
+//after the game is setup, maybe it takes a callback? work in progress
+var setup = gameSetup( socket );
 
-socket.on('newconnection', function( data ) {
-    d3.select('#selectPlayers').append('div').attr("id", "u" + data).html(data);
-})
-
-socket.on('disconnectedclient', function( data ) {
-    d3.select('#' + "u" + String(data)).remove();
-})
+var clientID = setup.ID;
 
 socket.on('load', function(a_game) {
 	console.log(a_game);
@@ -49,7 +39,7 @@ opponent_view.renderBarView();
 ball_view.renderBallView();
 
 /* Initialize all the controllers. */
-var player_controller = new ubarController(player_view, 'A', socket);
+var player_controller = new ubarController(player_view, clientID, socket);
 player_controller.keyListen();
 player_controller.socketEventListeners();
 ball_controller = new ballController(ball_view, socket);
