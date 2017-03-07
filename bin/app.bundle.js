@@ -56,7 +56,7 @@
 	    gameSetup = __webpack_require__(6);
 
 
-	var socket = io.connect('192.168.1.8:8000/');
+	var socket = io.connect('http://localhost:8000/');
 
 	var game;
 
@@ -65,7 +65,7 @@
 
 	var clientID = setup.ID;
 
-	socket.on('load', function(a_game) {
+	socket.on('startGame', function(a_game) {
 		console.log(a_game);
 		game = a_game;
 
@@ -85,7 +85,8 @@
 	ball_view.renderBallView();
 
 	/* Initialize all the controllers. */
-	var player_controller = new ubarController(player_view, clientID, socket);
+	console.log(setup.ID + "hello");
+	var player_controller = new ubarController(player_view, setup.ID, socket);
 	player_controller.keyListen();
 	player_controller.socketEventListeners();
 	ball_controller = new ballController(ball_view, socket);
@@ -440,43 +441,38 @@
 /* 6 */
 /***/ function(module, exports) {
 
-	var gameSetup = ( socket ) => {
+	var gameSetup = function(socket) {
 
-	    this.ID = "";
-
-	    socket.on('onconnected', function( data ) {
-	        
-	        this.ID = data['id'];
-
-	        for(var id in data.clients) {
-
-	            if(id !== data['id']) {
-
-	                d3.select('#selectPlayers')
-	                .append('div')
-	                .attr('id', 'u' + data.clients[id]['id'])
-	                .html(data.clients[id]['id']);
-	           
-
-	            }
-
-	        }
-
+	    var that = this;
+	    socket.on('onConnected', function( data ) {
+	        that.ID = data;
 	    })
 
 	    socket.on('newConnection', function( data ) {
 
-	            d3.select('#selectPlayers')
-	            .append('div')
-	            .attr("id", "u" + data['id'])
-	            .html(data['id']);
+	        var selectPlayers = d3.select('#selectPlayers');
+	        selectPlayers.html("");
+
+	            for(var id in data) {
+	                    d3.select('#selectPlayers')
+	                    .append('div')
+	                    .attr('id', 'u' + data[id]['id'])
+	                    .html(data[id]['id']);
+	            }
 
 	    })
 
 	    socket.on('disconnectedClient', function( data ) {
+	    
+	        var selectPlayers = d3.select('#selectPlayers');
+	        selectPlayers.html("");
 
-	        d3.select('#' + "u" + String(data['id'])).remove();
-
+	            for(var id in data) {
+	                    d3.select('#selectPlayers')
+	                    .append('div')
+	                    .attr('id', 'u' + data[id]['id'])
+	                    .html(data[id]['id']);
+	            }
 	    })  
 
 	    return this;

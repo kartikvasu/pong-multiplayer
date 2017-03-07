@@ -75,18 +75,16 @@ var gameOps = function(clientA, clientB) {
 	bars of *both* players. 
 	*/
 	var BarManager = function(that) {
-		var players = {
-			'A': that.playerA,
-			'B': that.playerB
-		},
-		
-		intervals = {
-			'A': that.playerAmoveInterval,
-			'B': that.playerBmoveInterval
-		},
-
-		clientA = that.clientA;
+		var clientA = that.clientA;
 		clientB = that.clientB;
+
+		var players = { };
+		players[that.clientA.userid] = that.playerA;
+		players[that.clientB.userid] = that.playerB;
+		
+		var intervals = { };
+		intervals[that.clientA.userid] = that.playerAmoveInterval;
+		intervals[that.clientB.userid]	= that.playerBmoveInterval;
 
 		/* stuff to be done when a key is pressed. */
 		var move = function(playerID, direction) {
@@ -108,7 +106,7 @@ var gameOps = function(clientA, clientB) {
 				clearInterval(intervals[ID]);
 		}
 
-		clientA.on('pressRight', function(playerID) {		
+		clientA.on('pressRight', function(playerID) {	
 			move(playerID, 'right');
 		});
 
@@ -118,7 +116,7 @@ var gameOps = function(clientA, clientB) {
 
 		clientA.on('keyup', stop);
 
-		clientB.on('pressRight', function(playerID) {		
+		clientB.on('pressRight', function(playerID) {	
 			move(playerID, 'right');
 		});
 

@@ -10,7 +10,7 @@ var //BarView object encapsulates rendering info for bar on the front-end.
     gameSetup = require('./game-setup');
 
 
-var socket = io.connect('192.168.1.8:8000/');
+var socket = io.connect('http://localhost:8000/');
 
 var game;
 
@@ -19,7 +19,7 @@ var setup = gameSetup( socket );
 
 var clientID = setup.ID;
 
-socket.on('load', function(a_game) {
+socket.on('startGame', function(a_game) {
 	console.log(a_game);
 	game = a_game;
 
